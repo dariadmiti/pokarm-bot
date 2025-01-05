@@ -13,5 +13,6 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "fabric>=3.2.2",
     "litecli>=1.12.3",
 ]
