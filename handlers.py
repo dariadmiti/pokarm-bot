@@ -7,6 +7,7 @@ from bot import bot
 import telebot as t
 from auth import message_auth
 
+from sqlalchemy import func
 from sqlalchemy.orm import sessionmaker
 from models import engine, Recipe
 
@@ -33,6 +34,15 @@ def send_welcome(message):
 def ask_recipe_name(message):
     telegram_session[message.from_user.id] = {'add_recipe': {}}
     bot.send_message(message.chat.id, 'Отлично! Какое название?')
+
+
+@bot.message_handler(commands=['random_recipe'])
+@message_auth
+def get_random_recipe(message):
+    recipe = db_session.query(Recipe).order_by(func.random()).first()
+    text = '\n\n'.join((recipe.name, recipe.ingredients, recipe.description))
+    bot.send_message(message.chat.id, text)
+
 
 @bot.message_handler()
 @message_auth
@@ -72,12 +82,4 @@ def handle_save_recipe_query(callback):
     db_session.commit()
 
     bot.send_message(callback.message.chat.id, 'Сохранено!')
-
-
-# @bot.message_handler(commands=['random'])
-# @message_auth
-# def get_random_recipe(message):
-#     bot.forward_message(message.chat.id, message.chat.id, random.choice(recipes))
-
-
 
