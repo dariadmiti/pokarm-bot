@@ -10,8 +10,8 @@ from auth import message_auth
 from sqlalchemy.orm import sessionmaker
 from models import engine, Recipe
 
-Session = sessionmaker(bind=engine)
-session = Session()
+DBSession = sessionmaker(bind=engine)
+db_session = DBSession()
 
 
 telegram_session = {}
@@ -67,13 +67,11 @@ def handle_message(message):
 @bot.callback_query_handler(func=lambda callback: callback.data == 'save_recipe')
 def handle_save_recipe_query(callback):
     recipe_data = telegram_session[callback.from_user.id]['add_recipe']
-#   new_recipe = Recipe(message_id=callback.data.split(',')[1])
-#   session.add(new_recipe)
-#   session.commit()
+    new_recipe = Recipe(**recipe_data)
+    db_session.add(new_recipe)
+    db_session.commit()
 
-    chat_id = callback.message.chat.id
-    # bot.edit_message_text('Заебись рецепт! Сохранить?', chat_id, callback.message.id)
-    bot.send_message(chat_id, "Сохранено!")
+    bot.send_message(callback.message.chat.id, 'Сохранено!')
 
 
 # @bot.message_handler(commands=['random'])

@@ -7,7 +7,7 @@ class Recipe(Base):
     __tablename__ = 'recipes'
     
     id = Column(Integer, primary_key=True)
-    name_test = Column(String, nullable=False)
+    name = Column(String, nullable=False)
     ingredients = Column(Text, nullable=False)
     description = Column(Text, nullable=False)
 
