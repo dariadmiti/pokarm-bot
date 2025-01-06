@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "alembic>=1.14.0",
+    "psycopg2>=2.9.10",
     "pytelegrambotapi>=4.23.0",
     "python-dotenv>=1.0.1",
     "sqlalchemy>=2.0.36",
@@ -14,5 +15,4 @@ dependencies = [
 [dependency-groups]
 dev = [
     "fabric>=3.2.2",
-    "litecli>=1.12.3",
 ]
