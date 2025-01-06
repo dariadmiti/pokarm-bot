@@ -1,4 +1,4 @@
-from bot import bot
+from bot.bot import bot
 from settings import DENIS_ID, DASHA_ID
 
 
