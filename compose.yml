@@ -1,0 +1,40 @@
+services:
+  web:
+    build: .
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - postgres
+    command: sh -c "python run.py"
+
+  postgres:
+    container_name: pokarm_bot_postgres
+    image: postgres:17.2-alpine3.21
+    env_file:
+      - .env
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+
+  redis:
+    container_name: pokarm_bot_redis
+    image: redis:7.4.1-alpine3.20
+    command: redis-server --appendonly no --maxmemory ${REDIS_MAXMEMORY:-1gb} --maxmemory-policy allkeys-lru
+    ports:
+      - 6379:6379
+    volumes:
+      - redis:/data
+
+volumes:
+  postgres:
+  redis:
+
