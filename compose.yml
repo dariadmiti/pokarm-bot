@@ -5,7 +5,7 @@ services:
       - .env
     depends_on:
       - redis
-    command: sh -c "python run.py"
+    command: sh -c "alembic upgrade head && python run.py"
 
   redis:
     container_name: pokarm_bot_redis
