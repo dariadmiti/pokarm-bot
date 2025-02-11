@@ -5,7 +5,6 @@ services:
       - .env
     depends_on:
       - redis
-      - postgres
     command: sh -c "python run.py"
 
   redis:
