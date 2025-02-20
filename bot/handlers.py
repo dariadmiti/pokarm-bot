@@ -3,11 +3,8 @@ import telebot as t
 from bot.auth import message_auth
 
 from sqlalchemy import func
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session
 from bot.models import engine, Recipe
-
-DBSession = sessionmaker(bind=engine)
-db_session = DBSession()
 
 
 telegram_session = {}
@@ -34,7 +31,8 @@ def ask_recipe_name(message):
 @bot.message_handler(commands=['random_recipe'])
 @message_auth
 def get_random_recipe(message):
-    recipe = db_session.query(Recipe).order_by(func.random()).first()
+    with Session(engine) as db_session:
+        recipe = db_session.query(Recipe).order_by(func.random()).first()
     text = '\n\n'.join((recipe.name, recipe.ingredients, recipe.description))
     bot.send_message(message.chat.id, text)
 
@@ -77,9 +75,10 @@ def handle_message(message):
     elif 'find_ingredient' in user_session:
         search_string = message.text
 
-        recipes = db_session.query(Recipe).filter(
-            Recipe.ingredients.contains(search_string)
-        ).all()
+        with Session(engine) as db_session:
+            recipes = db_session.query(Recipe).filter(
+                Recipe.ingredients.contains(search_string)
+            ).all()
 
         markup = t.types.InlineKeyboardMarkup()
         for recipe in recipes:
@@ -96,14 +95,16 @@ def handle_message(message):
 def handle_save_recipe_query(callback):
     recipe_data = telegram_session[callback.from_user.id]['add_recipe']
     new_recipe = Recipe(**recipe_data)
-    db_session.add(new_recipe)
-    db_session.commit()
+    with Session(engine) as db_session:
+        db_session.add(new_recipe)
+        db_session.commit()
 
     bot.send_message(callback.message.chat.id, 'Сохранено!')
 
 @bot.callback_query_handler(func=lambda callback: callback.data.split(',')[0] == 'get_recipe')
 def handle_get_recipe_query(callback):
     recipe_id = callback.data.split(',')[1]
-    recipe = db_session.query(Recipe).get(recipe_id)
+    with Session(engine) as db_session:
+        recipe = db_session.query(Recipe).get(recipe_id)
     text = '\n\n'.join((recipe.name, recipe.ingredients, recipe.description))
     bot.send_message(callback.message.chat.id, text)

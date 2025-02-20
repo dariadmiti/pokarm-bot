@@ -14,4 +14,4 @@ class Recipe(Base):
     ingredients = Column(Text, nullable=False)
     description = Column(Text, nullable=False)
 
-engine = create_engine(DATABASE_URL, pool_size=10)
+engine = create_engine(DATABASE_URL, pool_size=5, max_overflow=0)
